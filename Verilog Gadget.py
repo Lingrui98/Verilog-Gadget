@@ -19,7 +19,7 @@ import traceback
 try:
     from Guna.core.api import GunaApi
     guna_installed = True
-except Exception as e:
+except Exception:
     guna_installed = False
 
 
@@ -466,60 +466,6 @@ endmodule
         return check_extension(self.view.file_name(), self.view.name())
 
 
-##  class VerilogGadgetTemplateCommand (deprecated)  __________
-
-# class VerilogGadgetTemplateCommand(sublime_plugin.TextCommand):
-
-#     def run(self, edit):
-#         vgs = get_prefs()
-#         self.templ_list = vgs.get("templates", None)
-#         if not self.templ_list:
-#             sublime.status_message("Insert Template : No 'templates' setting found")
-#             return
-#         sel_list = []
-#         for l in self.templ_list:
-#             sel_list.append(l[0])
-#         self.window = sublime.active_window()
-#         self.window.show_quick_panel(sel_list, self.on_select)
-
-#     def on_select(self, index):
-#         if index == -1:
-#             return
-#         fname = self.templ_list[index][1]
-#         self.view.run_command("verilog_gadget_insert_template", {"args": {'fname': fname}})
-
-#     def is_visible(self):
-#         return check_extension(self.view.file_name(), self.view.name())
-
-
-##  class VerilogGadgetInsertTemplateCommand (deprecated)  ____
-
-# class VerilogGadgetInsertTemplateCommand(sublime_plugin.TextCommand):
-
-#     def run(self, edit, args):
-#         fname = args['fname']
-#         if fname == "example":
-#             if ST3:
-#                 text  = sublime.load_resource('Packages/Verilog Gadget/template/verilog_template_default.v')
-#             else:
-#                 fname = os.path.join(sublime.packages_path(), 'Verilog Gadget/template/verilog_template_default.v')
-#         if fname != "example":
-#             if fname.startswith('Packages'):
-#                 fname = re.sub('Packages', sublime.packages_path(), fname)
-#             if not os.path.isfile(fname):
-#                 sublime.status_message("Insert Template : File not found (" + fname + ")")
-#                 return
-#             else:
-#                 f = open(fname, "r")
-#                 text = str(f.read())
-#                 f.close()
-#         pos = self.view.sel()[0].begin()
-#         self.view.insert(edit, pos, text)
-
-#     def is_visible(self):
-#         return check_extension(self.view.file_name(), self.view.name())
-
-
 ##  class VerilogGadgetInsertHeaderCommand  ___________________
 
 class VerilogGadgetInsertHeaderCommand(sublime_plugin.TextCommand):
@@ -643,3 +589,109 @@ class VerilogGadgetInsertSubCommand(sublime_plugin.TextCommand):
         text = args['text']
         selr = self.view.sel()[0]
         self.view.insert(edit, selr.end(), text)
+
+
+##  class VerilogGadgetAlignCommand  __________________________
+
+REGXEXC = r"\ss*if[^\w]|\s*for[^\w]"
+REGXLHS = r".*?[\w\]\}](?=\s*\|=)|.*?[\w\]\}](?=\s*~=)|.*?[\w\]\}](?=\s*-=)|.*?[\w\]\}](?=\s*\+=)|.*?[\w\]\}](?=\s*<=)|.*?[\w\]\}](?=\s*=[^=])"
+REGXRHS = r"\|=.*|~=.*|-=.*|\+=.*|<=.*|=.*"
+
+class VerilogGadgetAlignCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        # get settings
+        tabs = self.view.settings().get('tab_size')
+
+        # get region
+        txtr = self.view.sel()[0]
+        self.regn = sublime.Region(self.view.line(txtr.begin()).begin(), self.view.line(txtr.end()).end())
+
+        # change tabs
+        txtn, mxlh = self.region_tab_to_space(self.view, tabs)
+
+        print (mxlh)
+
+        txtn = self.alignment(txtn, mxlh, tabs)
+
+        # replace all
+        self.view.replace(edit, self.regn, txtn)
+
+    def region_tab_to_space(self, view, tabs):
+        txtn = ""
+        lend = '\n'
+        pint = 0
+        mxlh = 0
+
+        rgnl = view.lines(self.regn)
+        if self.regn.end() != rgnl[-1].end():
+            self.regn = sublime.Region(self.regn.begin(), self.regn.end() - 1)
+
+        for idex, lreg in enumerate(rgnl):
+            lorg = view.substr(lreg)
+
+            # excludes
+            if bool(re.match(REGXEXC, lorg)):
+                txtn += lorg + ('' if (idex == len(rgnl) - 1) else lend)
+                continue
+
+            # extract left / right hand side
+            lhsl = re.compile(REGXLHS).findall(lorg)
+            rhsl = re.compile(REGXRHS).findall(lorg)
+
+            # only for assignment sentences
+            if len(lhsl) > 0 and len(rhsl) > 0:
+                # change tab to space
+                lnew = ""
+                frst = True
+                for c in lorg:
+                    if c == '\t':
+                        spce = (tabs - pint % tabs)
+                        pint += spce
+                        lnew += '\t' if frst else ' ' * spce
+                    else:
+                        pint += 1
+                        lnew += c
+                        frst = False
+                txtn += lnew + ('' if (idex == len(rgnl) - 1) else lend)
+
+                # extract align column number
+                lhsn = lhsl[0]
+                lenl = self.len_tab(lhsn, tabs)
+                if mxlh < lenl:
+                    mxlh = lenl
+            else:
+                txtn += lorg + ('' if (idex == len(rgnl) - 1) else lend)
+
+        return txtn, mxlh
+
+    def alignment(self, txts, mxlh, tabs):
+        txtn = ""
+        litr = len(txts.splitlines())
+        for i, s in enumerate(txts.splitlines()):
+            lend = '' if i + 1 == litr else '\n'
+
+            # excludes
+            if bool(re.match(REGXEXC, s)):
+                txtn += s + lend
+                continue
+
+            # depart left / right hand side
+            lhsl = re.compile(REGXLHS).findall(s)
+            rhsl = re.compile(REGXRHS).findall(s)
+
+            if len(lhsl) == 0 or len(rhsl) == 0:
+                txtn += s + lend
+            else:
+                lhsn = lhsl[0]
+                rhsn = rhsl[0]
+                lhsn = lhsn + ' ' * (mxlh - self.len_tab(lhsn, tabs) + 1)
+                txtn += lhsn + rhsn + lend
+
+        return txtn
+
+    def len_tab(self, strn, tabs):
+        pint = 0
+        for c in strn:
+            pint += (tabs - pint % tabs) if c == '\t' else 1
+        return pint

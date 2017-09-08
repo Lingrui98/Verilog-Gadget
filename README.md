@@ -1,6 +1,7 @@
 # Verilog Gadget for Sublime Text
 
 [![Package Control](https://packagecontrol.herokuapp.com/downloads/Verilog%20Gadget.svg?style=round-square)](https://packagecontrol.io/packages/Verilog%20Gadget)
+[![PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)][PM]
 
 Use __*Verilog Gadget Commands*__ in __*command palette*__ (*ctrl+shift+p*) or __context menu__ to run.
 The context menu only can be seen for `.v, .vh, .sv, .svh` file.
@@ -75,11 +76,22 @@ In settings : "header": "D:/template/verilog_header.v"
 
 ![Image][S3]
 
+#### Verilog Gadget: Alignment (ctrl+shift+x)
+
+ * Select range to apply alignment
+ * Press the shortcut key
+ * Alignment is based on the longest length of left hand side in selection
+ * Tabs will be replaced as spaces except for indent
+ * example)
+
+![Image][S4]
+
 #### Verilog Gadget: Insert Template (DEPRECATED)
 
 ### Donate
 
-[![Doate Image](https://raw.githubusercontent.com/poucotm/Links/master/image/PayPal/donate-paypal.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=89YVNDSC7DZHQ "PayPal")  
+[![Doate Image](https://raw.githubusercontent.com/poucotm/Links/master/image/PayPal/donate-paypal.png)][PM]
+
 Thank you for donating. It is helpful to continue to improve the plug-in.
 
 ### Issues
@@ -90,3 +102,6 @@ When you have an issue, tell me through [https://github.com/poucotm/Verilog-Gadg
 [S1]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-inst.gif
 [S2]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-tbg.gif
 [S3]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-rep.gif
+[S4]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-aln.gif
+[PP]:https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=89YVNDSC7DZHQ "PayPal"
+[PM]:https://www.paypal.me/poucotm/2.5 "PayPal"
