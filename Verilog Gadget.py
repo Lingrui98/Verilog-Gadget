@@ -144,9 +144,16 @@ def parse_module_param_port(text, call_from):
         for _str in port_s.split(","):
             port_s = re.compile(r"\w+").findall(_str)[-1]  # \w+(?!\w+)
             size_l = re.compile(r"\[.*\]|(?<!\S)signed\s*\[.*\]|(?<!\S)signed(?!\S)").findall(_str)
-            size_s = size_l[0] if len(size_l) > 0 else size_s  # preserve precendence
+            # patch ; size_s = size_l[0] if len(size_l) > 0 else size_s  # preserve precendence
             prtd_l = re.compile(r"(?<!\S)input(?!\S)|(?<!\S)output(?!\S)|(?<!\S)inout(?!\S)").findall(_str)
             prtd_s = prtd_l[0] if len(prtd_l) > 0 else prtd_s  # preserve precendence
+            if len(prtd_l) > 0:
+                if len(size_l) > 0:
+                    size_s = size_l[0]
+                else:
+                    size_s = ''
+            else:
+                size_s = size_s  # preserve precendence
             port_list.append([prtd_s, size_s, port_s])
     except:
         pass  # no port
@@ -171,7 +178,14 @@ def parse_module_param_port(text, call_from):
                 port_l = re.compile(r"\w+").findall(tmp_s)
                 port_s = port_l[-1] if len(port_l) > 0 else ""
                 size_l = re.compile(r"\[.*\]|(?<!\S)signed\s*\[.*\]|(?<!\S)signed(?!\S)").findall(tmp_s)
-                size_s = size_l[0] if len(size_l) > 0 else size_s  # preserve precendence
+                # patch ; size_s = size_l[0] if len(size_l) > 0 else size_s  # preserve precendence
+                if len(prtd_l) > 0:
+                    if len(size_l) > 0:
+                        size_s = size_l[0]
+                    else:
+                        size_s = ''
+                else:
+                    size_s = size_s  # preserve precendence
                 for i, _strl in enumerate(port_list):
                     if _strl[2] == port_s:
                         port_list[i][0] = prtd_s
@@ -609,9 +623,6 @@ class VerilogGadgetAlignCommand(sublime_plugin.TextCommand):
 
         # change tabs
         txtn, mxlh = self.region_tab_to_space(self.view, tabs)
-
-        print (mxlh)
-
         txtn = self.alignment(txtn, mxlh, tabs)
 
         # replace all
