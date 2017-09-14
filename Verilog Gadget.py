@@ -607,7 +607,7 @@ class VerilogGadgetInsertSubCommand(sublime_plugin.TextCommand):
 
 ##  class VerilogGadgetAlignCommand  __________________________
 
-REGXEXC = r"\ss*if[^\w]|\s*for[^\w]"
+REGXEXC = r"\s*if[^\w]|\s*for[^\w]"
 REGXLHS = r".*?[\w\]\}](?=\s*\|=)|.*?[\w\]\}](?=\s*~=)|.*?[\w\]\}](?=\s*-=)|.*?[\w\]\}](?=\s*\+=)|.*?[\w\]\}](?=\s*<=)|.*?[\w\]\}](?=\s*=[^=])"
 REGXRHS = r"\|=.*|~=.*|-=.*|\+=.*|<=.*|=.*"
 
