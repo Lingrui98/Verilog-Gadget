@@ -5,7 +5,7 @@
 
 Use __*Verilog Gadget Commands*__ in __*command palette*__ (*ctrl+shift+p*) or __context menu__ to run.
 The context menu only can be seen for `.v, .vh, .sv, .svh` file.
-(file extensions can be added or changed in settings)
+(file extensions can be added or changed in settings). The theme is [__Guna__](https://packagecontrol.io/packages/Guna), which is used in examples.
 
 #### Verilog Gadget: Instantiate Module (ctrl+shift+c)
 
