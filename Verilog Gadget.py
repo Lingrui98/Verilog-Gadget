@@ -411,16 +411,16 @@ class VerilogGadgetTbGenCommand(sublime_plugin.TextCommand):
         wtype = vgs.get("wave_type", "fsdb")
         if wtype == "fsdb":
             str_dump = """
-        $fsdbDumpfile("tb_""" + mod_name + """.fsdb");
-        $fsdbDumpvars(0, "tb_""" + mod_name + """", "+mda");"""
+		$fsdbDumpfile("tb_""" + mod_name + """.fsdb");
+		$fsdbDumpvars(0, "tb_""" + mod_name + """", "+mda");"""
         elif wtype == "vpd":
             str_dump = """
-        $vcdplusfile("tb_""" + mod_name + """.vpd");
-        $vcdpluson(0, "tb_""" + mod_name + """");"""
+		$vcdplusfile("tb_""" + mod_name + """.vpd");
+		$vcdpluson(0, "tb_""" + mod_name + """");"""
         elif wtype == "shm":
             str_dump = """
-        $shm_open("tb_""" + mod_name + """.shm");
-        $shm_probe();"""
+		$shm_open("tb_""" + mod_name + """.shm");
+		$shm_probe();"""
 
         declp = "" if len(declp) == 0 else declp + "\n"
         decls = "" if len(decls) == 0 else decls + "\n"
@@ -505,7 +505,7 @@ class VerilogGadgetInsertHeaderCommand(sublime_plugin.TextCommand):
                 with open(fname, "r", encoding="utf8") as f:
                     text  = str(f.read())
 
-        # replace {DATE}, {FILE}, {YEAR}, {TIME}, {TABS}, {SUBLIME_VERSION}, {ENCODING}
+        # replace {DATE}, {FILE}, {YEAR}, {TIME}, {TABS}, {SUBLIME_VERSION}
         date  = time.strftime('%Y-%m-%d', time.localtime())
         year  = time.strftime('%Y', time.localtime())
         ntime = time.strftime('%H:%M:%S', time.localtime())
@@ -517,7 +517,6 @@ class VerilogGadgetInsertHeaderCommand(sublime_plugin.TextCommand):
         text  = re.sub("{TIME}", ntime, text)               # {TIME}
         text  = re.sub("{TABS}", tabs, text)                # {TABS}
         text  = re.sub("{SUBLIME_VERSION}", sver, text)     # {SUBLIME_VERSION}
-        text  = re.sub("{ENCODING}", enco, text)            # {ENCODING}
         _file = re.compile(r"{FILE}").findall(text)
         if _file:
             fname = self.view.file_name()
@@ -534,6 +533,8 @@ class VerilogGadgetInsertHeaderCommand(sublime_plugin.TextCommand):
 
 
 ##  class VerilogGadgetRepeatCodeCommand  _____________________
+
+CLIPBOARD = r"--CLIPBOARD--"
 
 class VerilogGadgetRepeatCodeCommand(sublime_plugin.TextCommand):
 
@@ -577,14 +578,31 @@ class VerilogGadgetRepeatCodeCommand(sublime_plugin.TextCommand):
             return
 
         try:
-            tup_l = re.compile(r"(?<!{)\s*{\s*(?!{)").findall(self.text)
+            # clipboard
+            clb_l = re.compile(r"{\s*cb\s*}").findall(self.text)
+            if len(clb_l) > 0:
+                clb_s = sublime.get_clipboard().splitlines()
+                clb_f = True if len(clb_s) > 0 else False
+                t_txt = re.sub(re.compile(r"{\s*cb\s*}"), CLIPBOARD, self.text)
+            else:
+                clb_f = False
+                t_txt = self.text
+            # formatting
+            tup_l = re.compile(r"(?<!{)\s*{\s*(?!{)").findall(t_txt)
             tup_n = len(tup_l)
             repeat_str = ""
             for i in range(sta_n, end_n, rsp_n):
                 prm_l = []
+                if clb_f:
+                    if i < len(clb_s):
+                        r_txt = t_txt.replace(CLIPBOARD, clb_s[i])
+                    else:
+                        r_txt = t_txt.replace(CLIPBOARD, clb_s[-1])
+                else:
+                    r_txt = t_txt
                 for j in range(tup_n):
                     prm_l.append(i + j * csp_n)
-                repeat_str = repeat_str + '\n' + self.text.format(*prm_l)
+                repeat_str = repeat_str + '\n' + r_txt.format(*prm_l)
         except:
             disp_error("Repeat Code : Format error\n\n" + self.text)
             return

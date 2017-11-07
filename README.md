@@ -76,6 +76,12 @@ In settings : "header": "D:/template/verilog_header.v"
 
 ![Image][S3]
 
+ * It is possible to repeat numbers with clipboard text (line by line)
+ * Use ``{cb}`` for clipboard text
+ * example)
+
+![Image][S5]
+
 #### Verilog Gadget: Alignment (ctrl+shift+x)
 
  * Select range to apply alignment
@@ -103,5 +109,6 @@ When you have an issue, tell me through [https://github.com/poucotm/Verilog-Gadg
 [S2]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-tbg.gif
 [S3]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-rep.gif
 [S4]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-aln.gif
+[S5]:https://raw.githubusercontent.com/poucotm/Links/master/image/Verilog-Gadget/vg-rep-clip.gif
 [PP]:https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=89YVNDSC7DZHQ "PayPal"
 [PM]:https://www.paypal.me/poucotm/2.5 "PayPal"
