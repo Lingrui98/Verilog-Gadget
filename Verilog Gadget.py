@@ -122,7 +122,7 @@ def parse_module_param_port(text, call_from):
 
     # module ~ endmodule
     try:
-        text_s    = re.compile(r"(?<!\S)module(?!\S).+(?<!\S)endmodule(?!\S)").findall(text)[0]  # only for 1st module
+        text_s    = re.compile(r"(?<!\S)module(?!\S).+?(?<!\S)endmodule(?!\S)").findall(text)[0]  # only for 1st module
         module_rx = re.compile(r"module[^;]+;")  # module ... ;
         module_s  = module_rx.findall(text_s)[0]
         param_rx  = re.compile(r"\#\s*\(.*\)\s*(?=\()")  # find Verilog-2001 style parameters like #(parameter WIDTH = (12 - 1))
